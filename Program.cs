@@ -1,5 +1,7 @@
 ﻿using System;
 using MySql.Data.MySqlClient;
+using DotNetEnv;
+using CareerReadyApp.Data;
 
 namespace CareerReadyApp
 {
@@ -7,18 +9,23 @@ namespace CareerReadyApp
     {
         static void main(string[] args)
         {
-            string connectionString = "Server=localhost;Database=thelist;User ID=root;Password=Pass1234!;";
+            Env.Load();
 
-            using (var connection = new MySqlConnection(connectionString))
+            string connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? throw new InvalidOperationException("Connection string is not set.");
+
+            RunApplication(connectionString);
+        
+        }
+
+        private static void RunApplication(string connectionString)
+        {
+            try
             {
-                try{
-                    connection.Open();
-                    Console.WriteLine("We are the Borg.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Resistance is futile: {ex.Message}");
-                }
+                var dataAccess = new DataAccess(connectionString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An exception occurred while running the application: {ex.Message}");
             }
         }
     }
